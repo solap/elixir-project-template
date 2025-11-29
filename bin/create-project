@@ -1,0 +1,280 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# create-project - Bootstrap a new Elixir project with template
+# Usage: ./bin/create-project <project-name>
+
+VERSION="1.0.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
+
+success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+error() {
+    echo -e "${RED}✗${NC} $1"
+    exit 1
+}
+
+show_help() {
+    cat << EOF
+create-project v${VERSION}
+
+Bootstrap a new Elixir project with the template applied.
+
+USAGE:
+    ./bin/create-project [OPTIONS] <project-name>
+
+ARGUMENTS:
+    <project-name>          Name of the project (e.g., my_app)
+
+OPTIONS:
+    -h, --help              Show this help message
+    -v, --version           Show version
+    --type TYPE             Project type (phoenix|library|umbrella)
+    --dir DIRECTORY         Target directory (default: ./<project-name>)
+    --no-git                Skip git initialization
+
+DESCRIPTION:
+    This script creates a new Elixir project and applies the template:
+    1. Creates project directory
+    2. Runs 'mix new' or 'mix phx.new'
+    3. Copies template files
+    4. Runs interactive setup
+    5. Initializes git repository
+    6. Creates initial commit
+
+EXAMPLES:
+    # Create a Phoenix application
+    ./bin/create-project my_app --type phoenix
+
+    # Create a library
+    ./bin/create-project my_lib --type library
+
+    # Create in specific directory
+    ./bin/create-project my_app --dir /path/to/projects/my_app
+
+EOF
+}
+
+# Defaults
+PROJECT_NAME=""
+PROJECT_TYPE="phoenix"
+TARGET_DIR=""
+INIT_GIT=true
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--version)
+            echo "create-project v${VERSION}"
+            exit 0
+            ;;
+        --type)
+            PROJECT_TYPE="$2"
+            shift 2
+            ;;
+        --dir)
+            TARGET_DIR="$2"
+            shift 2
+            ;;
+        --no-git)
+            INIT_GIT=false
+            shift
+            ;;
+        -*)
+            error "Unknown option: $1\nUse --help for usage information."
+            ;;
+        *)
+            if [ -z "$PROJECT_NAME" ]; then
+                PROJECT_NAME="$1"
+            else
+                error "Unexpected argument: $1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Validate project name
+if [ -z "$PROJECT_NAME" ]; then
+    error "Project name is required\nUsage: ./bin/create-project <project-name>"
+fi
+
+# Validate project name format
+if ! [[ "$PROJECT_NAME" =~ ^[a-z][a-z0-9_]*$ ]]; then
+    error "Invalid project name: $PROJECT_NAME\nMust start with lowercase letter and contain only lowercase letters, numbers, and underscores"
+fi
+
+# Set target directory
+if [ -z "$TARGET_DIR" ]; then
+    TARGET_DIR="$(pwd)/$PROJECT_NAME"
+fi
+
+echo ""
+echo "=================================================="
+echo "  Creating New Elixir Project"
+echo "  Version ${VERSION}"
+echo "=================================================="
+echo ""
+
+info "Configuration:"
+echo "  Project Name: $PROJECT_NAME"
+echo "  Project Type: $PROJECT_TYPE"
+echo "  Directory: $TARGET_DIR"
+echo "  Initialize Git: $([ "$INIT_GIT" = true ] && echo "Yes" || echo "No")"
+echo ""
+
+# Check if directory exists
+if [ -d "$TARGET_DIR" ]; then
+    error "Directory already exists: $TARGET_DIR"
+fi
+
+# Check if mix is available
+if ! command -v mix >/dev/null 2>&1; then
+    error "mix command not found. Please install Elixir first."
+fi
+
+# Create project based on type
+info "Creating $PROJECT_TYPE project..."
+
+case $PROJECT_TYPE in
+    phoenix)
+        if ! command -v mix phx.new >/dev/null 2>&1; then
+            warn "Phoenix not installed. Installing Phoenix..."
+            mix archive.install hex phx_new --force
+        fi
+        mix phx.new "$TARGET_DIR" --no-install
+        ;;
+    library)
+        mix new "$TARGET_DIR"
+        ;;
+    umbrella)
+        mix new "$TARGET_DIR" --umbrella
+        ;;
+    *)
+        error "Unknown project type: $PROJECT_TYPE\nSupported types: phoenix, library, umbrella"
+        ;;
+esac
+
+success "Project created"
+echo ""
+
+# Copy template files
+info "Copying template files..."
+
+# Files to copy
+TEMPLATE_FILES=(
+    ".credo.exs"
+    ".formatter.exs"
+    ".doctor.exs"
+    ".sobelow-conf"
+    ".gitignore"
+    "CLAUDE.md"
+    "ADAPTATION-GUIDE.md"
+    "Makefile"
+)
+
+TEMPLATE_DIRS=(
+    ".claude"
+    ".github"
+    "bin"
+    "specs"
+    "docs"
+    "scripts"
+)
+
+cd "$TARGET_DIR"
+
+for file in "${TEMPLATE_FILES[@]}"; do
+    if [ -f "$TEMPLATE_ROOT/$file" ]; then
+        cp "$TEMPLATE_ROOT/$file" "$file"
+        [ -f "$file" ] && success "Copied $file"
+    fi
+done
+
+for dir in "${TEMPLATE_DIRS[@]}"; do
+    if [ -d "$TEMPLATE_ROOT/$dir" ]; then
+        cp -r "$TEMPLATE_ROOT/$dir" "$dir"
+        [ -d "$dir" ] && success "Copied $dir/"
+    fi
+done
+
+echo ""
+
+# Run setup script if available
+if [ -x "bin/setup-template" ]; then
+    info "Running interactive setup..."
+    echo ""
+    ./bin/setup-template
+else
+    warn "Setup script not found, skipping interactive setup"
+fi
+
+# Initialize git
+if [ "$INIT_GIT" = true ]; then
+    echo ""
+    info "Initializing git repository..."
+
+    if [ ! -d ".git" ]; then
+        git init
+        success "Git initialized"
+
+        git add .
+        git commit -m "Initial commit with Elixir project template
+
+- Project: $PROJECT_NAME
+- Type: $PROJECT_TYPE
+- Template version: ${VERSION}
+
+Generated with elixir-project-template
+"
+        success "Initial commit created"
+    else
+        warn "Git already initialized"
+    fi
+fi
+
+# Final message
+echo ""
+echo "=================================================="
+success "Project created successfully!"
+echo "=================================================="
+echo ""
+info "Next steps:"
+echo "  1. cd $TARGET_DIR"
+echo "  2. mix deps.get"
+echo "  3. mix compile"
+echo "  4. make quality"
+echo ""
+
+info "Useful commands:"
+echo "  make help              - See all available commands"
+echo "  make dev               - Start development server"
+echo "  make test              - Run tests"
+echo "  /prime                 - Initialize Claude Code context"
+echo ""
+
+info "Project location:"
+echo "  $TARGET_DIR"
+echo ""

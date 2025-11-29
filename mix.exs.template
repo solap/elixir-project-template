@@ -1,0 +1,122 @@
+defmodule {{PROJECT_MODULE}}.MixProject do
+  use Mix.Project
+
+  @version "0.1.0"
+  @source_url "https://github.com/{{GITHUB_USER}}/{{PROJECT_NAME}}"
+
+  def project do
+    [
+      app: :{{PROJECT_NAME}},
+      version: @version,
+      elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
+      deps: deps(),
+
+      # Testing
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+        "coveralls.github": :test
+      ],
+
+      # Documentation
+      name: "{{PROJECT_NAME}}",
+      source_url: @source_url,
+      docs: docs(),
+
+      # Dialyzer
+      dialyzer: [
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        plt_add_apps: [:mix, :ex_unit]
+      ]
+    ]
+  end
+
+  # Run "mix help compile.app" to learn about applications.
+  def application do
+    [
+      mod: {{{PROJECT_MODULE}}.Application, []},
+      extra_applications: [:logger, :runtime_tools]
+    ]
+  end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
+  # Run "mix help deps" to learn about dependencies.
+  defp deps do
+    [
+      # Web Framework (if using Phoenix)
+      # {:phoenix, "~> 1.7.14"},
+      # {:phoenix_ecto, "~> 4.5"},
+      # {:phoenix_html, "~> 4.1"},
+      # {:phoenix_live_reload, "~> 1.5", only: :dev},
+      # {:phoenix_live_view, "~> 1.0.0"},
+      # {:phoenix_live_dashboard, "~> 0.8.5"},
+      # {:plug_cowboy, "~> 2.7"},
+
+      # Database (if using Ecto)
+      # {:ecto_sql, "~> 3.12"},
+      # {:postgrex, ">= 0.0.0"},
+
+      # GraphQL (if using Absinthe)
+      # {:absinthe, "~> 1.7"},
+      # {:absinthe_plug, "~> 1.5"},
+      # {:absinthe_phoenix, "~> 2.0"},
+
+      # Background Jobs (if using Oban)
+      # {:oban, "~> 2.18"},
+
+      # JSON parsing
+      {:jason, "~> 1.4"},
+
+      # HTTP client
+      {:tesla, "~> 1.11"},
+
+      # Quality Tools (development and test only)
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:doctor, "~> 0.22", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.35", only: :dev, runtime: false},
+      {:sobelow, "~> 0.13", only: :dev, runtime: false},
+
+      # Testing
+      {:excoveralls, "~> 0.18", only: :test},
+      {:mock, "~> 0.3", only: :test}
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  defp aliases do
+    [
+      setup: ["deps.get", "ecto.setup"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      quality: [
+        "format --check-formatted",
+        "compile --warnings-as-errors",
+        "credo --min-priority high",
+        "dialyzer",
+        "doctor",
+        "test"
+      ]
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      extras: ["README.md", "CHANGELOG.md", "LICENSE.md"],
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      formatters: ["html"]
+    ]
+  end
+end

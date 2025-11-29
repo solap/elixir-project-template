@@ -1,0 +1,83 @@
+name: Quality Checks
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Erlang and Elixir
+        uses: erlef/setup-beam@v1
+        id: setup-beam
+        with:
+          version-type: strict
+          version-file: .tool-versions
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Check for retired dependencies
+        run: mix hex.audit
+
+      - name: Check for unused dependencies
+        run: mix deps.unlock --check-unused
+
+      - name: Check code formatting
+        run: mix format --check-formatted
+
+      - name: Compile with warnings as errors
+        run: mix compile --all-warnings --warnings-as-errors
+
+      - name: Run Credo (static code analysis)
+        run: mix credo --min-priority high
+
+      - name: Run Sobelow (security analysis)
+        run: mix sobelow --config
+        continue-on-error: true
+
+      - name: Run Dialyzer (type checking)
+        run: mix dialyzer
+        continue-on-error: true
+
+      - name: Check documentation coverage
+        run: mix doctor
+        continue-on-error: true
+
+      - name: Run tests with coverage
+        env:
+          MIX_ENV: test
+        run: mix coveralls.github

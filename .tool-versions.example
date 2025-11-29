@@ -1,0 +1,37 @@
+# Elixir Project Version Management
+#
+# This file specifies the Elixir and Erlang versions for this project.
+# Used by asdf version manager (https://asdf-vm.com/)
+#
+# Also compatible with:
+# - rtx/mise: https://github.com/jdx/mise
+# - direnv: with asdf plugin
+#
+# Version Compatibility:
+# - Elixir 1.17+ requires OTP 26-27
+# - Elixir 1.18+ requires OTP 27-28
+#
+# Installation:
+# 1. Install asdf: https://asdf-vm.com/guide/getting-started.html
+# 2. Install plugins:
+#    asdf plugin add elixir
+#    asdf plugin add erlang
+# 3. Copy this file:
+#    cp .tool-versions.example .tool-versions
+# 4. Install versions:
+#    asdf install
+#
+# Recommended versions (as of January 2025):
+
+elixir 1.18.1-otp-28
+erlang 28.0
+
+# Alternative configurations:
+#
+# For Elixir 1.17 with OTP 27:
+# elixir 1.17.3-otp-27
+# erlang 27.3
+#
+# For maximum compatibility:
+# elixir 1.17.0-otp-26
+# erlang 26.2

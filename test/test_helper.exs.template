@@ -1,0 +1,58 @@
+# Start ExUnit with recommended options
+ExUnit.start(
+  # Automatically format test output
+  formatters: [ExUnit.CLIFormatter],
+  # Capture log output during tests
+  capture_log: true,
+  # Show test execution times
+  trace: false,
+  # Maximum number of failures before aborting
+  max_failures: :infinity
+)
+
+# Configure Ecto Sandbox for concurrent testing (if using Ecto)
+# Ecto.Adapters.SQL.Sandbox.mode({{PROJECT_MODULE}}.Repo, :manual)
+
+# Helper module for common test functionality
+defmodule {{PROJECT_MODULE}}.TestHelpers do
+  @moduledoc """
+  Common helper functions for tests.
+  """
+
+  @doc """
+  Setup function for tests that require database access.
+
+  ## Examples
+
+      setup :setup_database
+
+  """
+  def setup_database(_context) do
+    # Checkout a connection from the pool for this test
+    # :ok = Ecto.Adapters.SQL.Sandbox.checkout({{PROJECT_MODULE}}.Repo)
+    :ok
+  end
+
+  @doc """
+  Helper to create test fixtures.
+  """
+  def fixture(name, attrs \\ %{})
+
+  def fixture(:user, attrs) do
+    %{
+      email: "test@example.com",
+      name: "Test User"
+    }
+    |> Map.merge(attrs)
+  end
+
+  @doc """
+  Assert that a map contains expected keys and values.
+  """
+  def assert_maps_equal(actual, expected, keys) when is_list(keys) do
+    Enum.each(keys, fn key ->
+      assert Map.get(actual, key) == Map.get(expected, key),
+             "Expected #{inspect(key)} to be #{inspect(Map.get(expected, key))}, got #{inspect(Map.get(actual, key))}"
+    end)
+  end
+end

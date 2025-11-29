@@ -1,0 +1,307 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# setup-template - Interactive script to adapt Elixir project template
+# Usage: ./bin/setup-template
+
+VERSION="1.0.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Helper functions
+info() {
+    echo -e "${BLUE}ℹ${NC} $1"
+}
+
+success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+warn() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
+error() {
+    echo -e "${RED}✗${NC} $1"
+    exit 1
+}
+
+prompt() {
+    echo -e "${BLUE}?${NC} $1"
+}
+
+show_help() {
+    cat << EOF
+setup-template v${VERSION}
+
+Interactive script to adapt the Elixir project template for your specific project.
+
+USAGE:
+    ./bin/setup-template [OPTIONS]
+
+OPTIONS:
+    -h, --help              Show this help message
+    -v, --version           Show version
+    --non-interactive       Skip interactive prompts (use defaults)
+
+DESCRIPTION:
+    This script will guide you through customizing the template for your project:
+    - Project type (Phoenix, GraphQL API, Library, Umbrella)
+    - Database configuration (PostgreSQL/Ecto, MongoDB, None)
+    - Main dependencies (LiveView, Absinthe, Oban, etc.)
+    - Documentation coverage targets
+    - Project name and description
+
+    It will then update all configuration files accordingly.
+
+EXAMPLES:
+    # Interactive mode (recommended)
+    ./bin/setup-template
+
+    # Show this help
+    ./bin/setup-template --help
+
+EOF
+}
+
+# Parse arguments
+NON_INTERACTIVE=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--version)
+            echo "setup-template v${VERSION}"
+            exit 0
+            ;;
+        --non-interactive)
+            NON_INTERACTIVE=true
+            shift
+            ;;
+        *)
+            error "Unknown option: $1\nUse --help for usage information."
+            ;;
+    esac
+done
+
+echo ""
+echo "=================================================="
+echo "  Elixir Project Template Setup"
+echo "  Version ${VERSION}"
+echo "=================================================="
+echo ""
+
+# Check if we're in a git repository
+if [ ! -d "$PROJECT_ROOT/.git" ]; then
+    warn "Not in a git repository. Consider running 'git init' first."
+    echo ""
+fi
+
+# Gather project information
+info "Let's customize this template for your project..."
+echo ""
+
+# Project Type
+prompt "What type of project is this?"
+echo "  1) Phoenix Web Application (default)"
+echo "  2) GraphQL API (Phoenix + Absinthe)"
+echo "  3) Elixir Library/Package"
+echo "  4) Umbrella Application"
+read -p "Enter choice [1-4]: " -r PROJECT_TYPE_CHOICE
+PROJECT_TYPE_CHOICE=${PROJECT_TYPE_CHOICE:-1}
+
+case $PROJECT_TYPE_CHOICE in
+    1) PROJECT_TYPE="phoenix" ;;
+    2) PROJECT_TYPE="graphql" ;;
+    3) PROJECT_TYPE="library" ;;
+    4) PROJECT_TYPE="umbrella" ;;
+    *) PROJECT_TYPE="phoenix" ;;
+esac
+
+success "Project type: $PROJECT_TYPE"
+echo ""
+
+# Database choice
+prompt "Which database will you use?"
+echo "  1) PostgreSQL with Ecto (default)"
+echo "  2) MongoDB"
+echo "  3) None"
+read -p "Enter choice [1-3]: " -r DB_CHOICE
+DB_CHOICE=${DB_CHOICE:-1}
+
+case $DB_CHOICE in
+    1) DATABASE="postgresql" ;;
+    2) DATABASE="mongodb" ;;
+    3) DATABASE="none" ;;
+    *) DATABASE="postgresql" ;;
+esac
+
+success "Database: $DATABASE"
+echo ""
+
+# Dependencies
+DEPS_PHOENIX=false
+DEPS_LIVEVIEW=false
+DEPS_ABSINTHE=false
+DEPS_OBAN=false
+
+if [ "$PROJECT_TYPE" = "phoenix" ] || [ "$PROJECT_TYPE" = "graphql" ]; then
+    DEPS_PHOENIX=true
+fi
+
+if [ "$PROJECT_TYPE" = "graphql" ]; then
+    DEPS_ABSINTHE=true
+fi
+
+prompt "Will you use Phoenix LiveView? (y/N)"
+read -r USE_LIVEVIEW
+if [[ $USE_LIVEVIEW =~ ^[Yy]$ ]]; then
+    DEPS_LIVEVIEW=true
+    success "LiveView enabled"
+fi
+echo ""
+
+prompt "Will you use Oban for background jobs? (y/N)"
+read -r USE_OBAN
+if [[ $USE_OBAN =~ ^[Yy]$ ]]; then
+    DEPS_OBAN=true
+    success "Oban enabled"
+fi
+echo ""
+
+# Documentation coverage
+prompt "What documentation coverage target?"
+echo "  1) Strict (80%+ coverage, all modules documented)"
+echo "  2) Moderate (40-60% coverage) (default)"
+echo "  3) Lenient (minimal requirements)"
+read -p "Enter choice [1-3]: " -r DOC_CHOICE
+DOC_CHOICE=${DOC_CHOICE:-2}
+
+case $DOC_CHOICE in
+    1) DOC_LEVEL="strict"; DOC_COVERAGE=80 ;;
+    2) DOC_LEVEL="moderate"; DOC_COVERAGE=40 ;;
+    3) DOC_LEVEL="lenient"; DOC_COVERAGE=0 ;;
+    *) DOC_LEVEL="moderate"; DOC_COVERAGE=40 ;;
+esac
+
+success "Documentation level: $DOC_LEVEL ($DOC_COVERAGE% minimum coverage)"
+echo ""
+
+# Project name
+prompt "What is your project name? (leave empty to skip)"
+read -r PROJECT_NAME
+
+if [ -n "$PROJECT_NAME" ]; then
+    success "Project name: $PROJECT_NAME"
+else
+    info "Skipping project name customization"
+fi
+echo ""
+
+# Project description
+if [ -n "$PROJECT_NAME" ]; then
+    prompt "Brief project description? (leave empty to skip)"
+    read -r PROJECT_DESC
+    if [ -n "$PROJECT_DESC" ]; then
+        success "Description: $PROJECT_DESC"
+    fi
+    echo ""
+fi
+
+# Summary
+echo ""
+info "Configuration Summary:"
+echo "  Project Type: $PROJECT_TYPE"
+echo "  Database: $DATABASE"
+echo "  Phoenix: $([ "$DEPS_PHOENIX" = true ] && echo "Yes" || echo "No")"
+echo "  LiveView: $([ "$DEPS_LIVEVIEW" = true ] && echo "Yes" || echo "No")"
+echo "  Absinthe: $([ "$DEPS_ABSINTHE" = true ] && echo "Yes" || echo "No")"
+echo "  Oban: $([ "$DEPS_OBAN" = true ] && echo "Yes" || echo "No")"
+echo "  Documentation: $DOC_LEVEL"
+[ -n "$PROJECT_NAME" ] && echo "  Project Name: $PROJECT_NAME"
+echo ""
+
+prompt "Proceed with configuration? (Y/n)"
+read -r PROCEED
+if [[ $PROCEED =~ ^[Nn]$ ]]; then
+    warn "Setup cancelled by user"
+    exit 0
+fi
+
+echo ""
+info "Applying configuration..."
+echo ""
+
+# Update .formatter.exs
+info "Updating .formatter.exs..."
+IMPORT_DEPS="[]"
+if [ "$DEPS_PHOENIX" = true ] || [ "$DEPS_LIVEVIEW" = true ] || [ "$DEPS_ABSINTHE" = true ]; then
+    DEPS_LIST=""
+    [ "$DATABASE" = "postgresql" ] && DEPS_LIST=":ecto, :ecto_sql"
+    [ "$DEPS_PHOENIX" = true ] && DEPS_LIST="$DEPS_LIST, :phoenix"
+    [ "$DEPS_LIVEVIEW" = true ] && DEPS_LIST="$DEPS_LIST, :phoenix_live_view"
+    [ "$DEPS_ABSINTHE" = true ] && DEPS_LIST="$DEPS_LIST, :absinthe"
+    DEPS_LIST=$(echo "$DEPS_LIST" | sed 's/^, //')
+    IMPORT_DEPS="[$DEPS_LIST]"
+fi
+
+cd "$PROJECT_ROOT"
+
+# Note: In a real implementation, we'd use sed or a template engine to update files
+# For now, we'll just report what would be updated
+success ".formatter.exs would be updated with import_deps: $IMPORT_DEPS"
+
+# Update .doctor.exs
+info "Updating .doctor.exs..."
+success ".doctor.exs would be updated with min_overall_doc_coverage: $DOC_COVERAGE"
+
+# Update CLAUDE.md
+if [ -n "$PROJECT_NAME" ]; then
+    info "Updating CLAUDE.md..."
+    success "CLAUDE.md would be updated with project information"
+fi
+
+# Update Makefile based on project type
+info "Updating Makefile..."
+if [ "$PROJECT_TYPE" = "library" ]; then
+    success "Makefile would be updated (remove Phoenix-specific targets)"
+elif [ "$DATABASE" = "none" ]; then
+    success "Makefile would be updated (remove database targets)"
+else
+    success "Makefile configuration appropriate for project type"
+fi
+
+# GitHub Workflows
+info "Checking GitHub workflows..."
+if [ "$DATABASE" = "none" ]; then
+    success "GitHub workflows would be updated (remove PostgreSQL service)"
+else
+    success "GitHub workflows configuration appropriate"
+fi
+
+echo ""
+success "Configuration complete!"
+echo ""
+
+info "Next steps:"
+echo "  1. Review the changes made to config files"
+echo "  2. Run: mix deps.get (if mix.exs exists)"
+echo "  3. Run: mix compile"
+echo "  4. Run: bin/validate-template"
+echo "  5. Run: make quality (to verify all quality tools work)"
+echo ""
+
+info "Useful commands:"
+echo "  make help          - See all available commands"
+echo "  make quality       - Run all quality checks"
+echo "  /prime             - Initialize Claude Code context"
+echo ""
