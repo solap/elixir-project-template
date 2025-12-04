@@ -10,15 +10,13 @@ defmodule Explore.Game.Config.Loader do
   - levels/*.yml - Level/wave definitions
   """
 
-  @config_path "priv/game_config"
-
   @doc """
   Loads a YAML configuration file by name.
   Returns {:ok, config} or {:error, reason}.
   """
   @spec load(String.t()) :: {:ok, map()} | {:error, term()}
   def load(filename) do
-    path = Path.join([@config_path, filename])
+    path = Path.join([config_path(), filename])
 
     case File.read(path) do
       {:ok, content} ->
@@ -119,4 +117,9 @@ defmodule Explore.Game.Config.Loader do
   end
 
   defp atomize_keys(value), do: value
+
+  # Get the config path - works in both dev and release modes
+  defp config_path do
+    Application.app_dir(:explore, "priv/game_config")
+  end
 end
