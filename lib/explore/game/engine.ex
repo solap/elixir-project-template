@@ -423,10 +423,15 @@ defmodule Explore.Game.Engine do
   end
 
   defp get_available_towers(state) do
-    if state.designer_mode do
-      Map.keys(Map.get(state.config, :towers, %{}))
-    else
-      Tree.available_towers(state.tech_tree)
+    cond do
+      state.designer_mode ->
+        Map.keys(Map.get(state.config, :towers, %{}))
+
+      state.tech_tree == nil ->
+        []
+
+      true ->
+        Tree.available_towers(state.tech_tree)
     end
   end
 end
