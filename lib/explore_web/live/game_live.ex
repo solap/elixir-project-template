@@ -90,7 +90,13 @@ defmodule ExploreWeb.GameLive do
               <span class="font-bold">{@game_state.world.score}</span>
             </div>
           </div>
-          <div class="flex gap-4">
+          <div class="flex gap-4 items-center">
+            <button
+              phx-click="toggle_designer_mode"
+              class={"px-3 py-1 rounded text-sm font-semibold transition-all #{if @designer_mode, do: "bg-yellow-500 hover:bg-yellow-600 text-black ring-2 ring-yellow-300", else: "bg-gray-600 hover:bg-gray-500"}"}
+            >
+              {if @designer_mode, do: "Exit Designer Mode", else: "Designer Mode"}
+            </button>
             <%= if @game_state.world.state == :waiting do %>
               <button
                 phx-click="start_wave"
@@ -146,14 +152,17 @@ defmodule ExploreWeb.GameLive do
         <div class="flex flex-col gap-2">
           <%= for tower_type <- @game_state.available_towers do %>
             <% tower_config = Map.get(@game_state.config.towers, tower_type, %{}) %>
+            <% cost = Map.get(tower_config, :cost, 0) %>
+            <% can_afford = cost <= @game_state.world.resources %>
+            <% is_disabled = not @designer_mode and not can_afford %>
             <button
               phx-click="select_tower"
               phx-value-type={tower_type}
-              class={"tower-button #{if @selected_tower == tower_type, do: "selected"} #{if Map.get(tower_config, :cost, 0) > @game_state.world.resources, do: "disabled"}"}
-              disabled={Map.get(tower_config, :cost, 0) > @game_state.world.resources}
+              class={"tower-button #{if @selected_tower == tower_type, do: "selected"} #{if is_disabled, do: "disabled"}"}
+              disabled={is_disabled}
             >
               <div class="font-semibold">{Map.get(tower_config, :name, tower_type)}</div>
-              <div class="text-sm text-yellow-500">{Map.get(tower_config, :cost, 100)} gold</div>
+              <div class="text-sm text-yellow-500">{cost} gold</div>
             </button>
           <% end %>
         </div>
@@ -269,6 +278,18 @@ defmodule ExploreWeb.GameLive do
   @impl true
   def handle_event("toggle_debug", _params, socket) do
     {:noreply, assign(socket, :show_debug, not socket.assigns.show_debug)}
+  end
+
+  @impl true
+  def handle_event("toggle_designer_mode", _params, socket) do
+    new_mode = not socket.assigns.designer_mode
+    Engine.set_designer_mode(socket.assigns.engine_pid, new_mode)
+    game_state = Engine.get_state(socket.assigns.engine_pid)
+
+    {:noreply,
+     socket
+     |> assign(:designer_mode, new_mode)
+     |> assign(:game_state, game_state)}
   end
 
   @impl true

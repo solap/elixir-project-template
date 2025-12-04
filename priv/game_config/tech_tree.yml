@@ -5,8 +5,37 @@ tech_tree:
       description: "Unlock basic tower types"
       unlocks:
         - arrow_tower
+        - cannon_tower
       requirements: []
       cost: 0
+
+    precision:
+      name: "Precision"
+      description: "Long range accuracy"
+      unlocks:
+        - sniper_tower
+      requirements:
+        - basic_towers
+      cost: 150
+
+    toxins:
+      name: "Toxins"
+      description: "Deadly poisons"
+      unlocks:
+        - poison_tower
+      requirements:
+        - basic_towers
+      cost: 120
+
+    energy_tech:
+      name: "Energy Technology"
+      description: "Harness pure energy"
+      unlocks:
+        - laser_tower
+      requirements:
+        - fire_mastery
+        - frost_mastery
+      cost: 200
 
     fire_mastery:
       name: "Fire Mastery"
@@ -57,3 +86,9 @@ tech_tree:
 
   starting_unlocked:
     - basic_towers
+    - fire_mastery
+    - frost_mastery
+    - explosives
+    - precision
+    - toxins
+    - energy_tech

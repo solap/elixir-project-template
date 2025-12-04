@@ -122,8 +122,15 @@ defmodule Explore.Game.Config.TowerConfig do
       |> Map.put_new(:fire_rate, 1.0)
       |> Map.put_new(:projectile_speed, 300)
 
+    visual = Map.get(config, :visual, %{})
+
+    normalized_visual =
+      visual
+      |> Map.update(:projectile_type, :arrow, &to_atom/1)
+
     config
     |> Map.put(:stats, normalized_stats)
+    |> Map.put(:visual, normalized_visual)
     |> Map.update(:targeting, :first, &to_atom/1)
     |> Map.update(:effects, [], fn effects ->
       Enum.map(effects, fn effect ->

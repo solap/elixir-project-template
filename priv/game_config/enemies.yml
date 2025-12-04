@@ -5,6 +5,12 @@ enemies:
     speed: 50
     reward: 10
     resistances: {}
+    visual:
+      size: medium
+      color: "#DC2626"
+      accent: "#7F1D1D"
+      shape: circle
+      animation: bounce
 
   runner:
     name: "Runner"
@@ -12,6 +18,12 @@ enemies:
     speed: 100
     reward: 15
     resistances: {}
+    visual:
+      size: small
+      color: "#22D3EE"
+      accent: "#0E7490"
+      shape: triangle
+      animation: wobble
 
   tank:
     name: "Tank"
@@ -20,6 +32,12 @@ enemies:
     reward: 50
     resistances:
       physical: 0.3
+    visual:
+      size: large
+      color: "#374151"
+      accent: "#1F2937"
+      shape: square
+      animation: crawl
 
   fire_elemental:
     name: "Fire Elemental"
@@ -30,6 +48,12 @@ enemies:
       fire: 0.8
     weaknesses:
       ice: 0.5
+    visual:
+      size: medium
+      color: "#F97316"
+      accent: "#FACC15"
+      shape: blob
+      animation: pulse
 
   ice_golem:
     name: "Ice Golem"
@@ -41,6 +65,12 @@ enemies:
     weaknesses:
       fire: 0.5
       lightning: 0.3
+    visual:
+      size: large
+      color: "#38BDF8"
+      accent: "#E0F2FE"
+      shape: square
+      animation: crawl
 
   swarm:
     name: "Swarm"
@@ -51,12 +81,24 @@ enemies:
       split_on_death:
         count: 2
         type: mini_swarm
+    visual:
+      size: small
+      color: "#A855F7"
+      accent: "#7C3AED"
+      shape: blob
+      animation: wobble
 
   mini_swarm:
     name: "Mini Swarm"
     health: 15
     speed: 80
     reward: 2
+    visual:
+      size: tiny
+      color: "#C084FC"
+      accent: "#A855F7"
+      shape: blob
+      animation: wobble
 
   boss_ogre:
     name: "Ogre Boss"
@@ -71,3 +113,71 @@ enemies:
       regenerate:
         amount: 5
         interval: 1000
+    visual:
+      size: boss
+      color: "#65A30D"
+      accent: "#3F6212"
+      shape: square
+      animation: pulse
+
+  speeder:
+    name: "Speeder"
+    health: 40
+    speed: 120
+    reward: 20
+    resistances: {}
+    visual:
+      size: small
+      color: "#FBBF24"
+      accent: "#D97706"
+      shape: triangle
+      animation: wobble
+
+  armored:
+    name: "Armored"
+    health: 400
+    speed: 35
+    reward: 45
+    resistances:
+      physical: 0.5
+      fire: 0.2
+    visual:
+      size: large
+      color: "#6B7280"
+      accent: "#374151"
+      shape: square
+      animation: crawl
+
+  healer:
+    name: "Healer"
+    health: 80
+    speed: 45
+    reward: 30
+    resistances: {}
+    special:
+      regenerate:
+        amount: 3
+        interval: 500
+    visual:
+      size: medium
+      color: "#34D399"
+      accent: "#10B981"
+      shape: circle
+      animation: float
+
+  ghost:
+    name: "Ghost"
+    health: 60
+    speed: 55
+    reward: 25
+    resistances:
+      physical: 0.7
+    weaknesses:
+      lightning: 0.5
+      energy: 0.5
+    visual:
+      size: medium
+      color: "#E5E7EB"
+      accent: "#9CA3AF"
+      shape: blob
+      animation: float

@@ -161,7 +161,15 @@ defmodule Explore.Game.Engine do
       true ->
         cost = Map.get(tower_config, :cost, 100)
 
-        case World.spend_resources(state.world, cost) do
+        # In designer mode, skip resource spending
+        spend_result =
+          if state.designer_mode do
+            {:ok, state.world}
+          else
+            World.spend_resources(state.world, cost)
+          end
+
+        case spend_result do
           {:ok, world_after_spend} ->
             snapped_pos = GameMap.snap_to_grid(world_after_spend.map, position)
             tower = TowerConfig.to_tower(tower_type, snapped_pos, tower_config)

@@ -14,14 +14,28 @@ defmodule Explore.Game.Entities.Projectile do
   @type position :: {number(), number()}
   @type damage_type :: :physical | :fire | :ice | :lightning | :poison
 
+  @type projectile_type ::
+          :arrow
+          | :bullet
+          | :cannonball
+          | :bomb
+          | :fireball
+          | :iceball
+          | :lightning
+          | :poison_glob
+          | :laser_beam
+          | :none
+
   @type t :: %__MODULE__{
           id: String.t(),
           tower_id: String.t(),
           target_id: String.t(),
           position: position(),
           target_position: position(),
+          source_position: position(),
           damage: number(),
           damage_type: damage_type(),
+          projectile_type: projectile_type(),
           speed: number(),
           aoe_radius: number(),
           effects: list(Effect.t()),
@@ -35,8 +49,10 @@ defmodule Explore.Game.Entities.Projectile do
             target_id: nil,
             position: {0, 0},
             target_position: {0, 0},
+            source_position: {0, 0},
             damage: 10,
             damage_type: :physical,
+            projectile_type: :arrow,
             speed: 300,
             aoe_radius: 0,
             effects: [],
@@ -50,15 +66,18 @@ defmodule Explore.Game.Entities.Projectile do
   @spec new(map()) :: t()
   def new(attrs) do
     id = generate_id()
+    position = Map.get(attrs, :position, {0, 0})
 
     %__MODULE__{
       id: id,
       tower_id: Map.get(attrs, :tower_id),
       target_id: Map.get(attrs, :target_id),
-      position: Map.get(attrs, :position, {0, 0}),
+      position: position,
       target_position: Map.get(attrs, :target_position, {0, 0}),
+      source_position: position,
       damage: Map.get(attrs, :damage, 10),
       damage_type: Map.get(attrs, :damage_type, :physical),
+      projectile_type: Map.get(attrs, :projectile_type, :arrow),
       speed: Map.get(attrs, :speed, 300),
       aoe_radius: Map.get(attrs, :aoe_radius, 0),
       effects: Map.get(attrs, :effects, []),

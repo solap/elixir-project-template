@@ -37,9 +37,9 @@ level:
         - type: runner
           count: 15
           interval: 500
-        - type: grunt
-          count: 10
-          interval: 800
+        - type: speeder
+          count: 8
+          interval: 600
       delay_after: 5000
 
     - number: 5
@@ -57,6 +57,9 @@ level:
         - type: swarm
           count: 20
           interval: 400
+        - type: ghost
+          count: 6
+          interval: 1500
       delay_after: 5000
 
     - number: 7
@@ -67,14 +70,11 @@ level:
         - type: fire_elemental
           count: 6
           interval: 1000
-        - type: grunt
-          count: 10
-          interval: 800
       delay_after: 7000
 
     - number: 8
       enemies:
-        - type: tank
+        - type: armored
           count: 5
           interval: 1800
         - type: runner
@@ -84,29 +84,20 @@ level:
 
     - number: 9
       enemies:
-        - type: swarm
-          count: 30
-          interval: 300
+        - type: healer
+          count: 8
+          interval: 1500
         - type: ice_golem
           count: 5
           interval: 2000
-        - type: fire_elemental
-          count: 8
-          interval: 1000
       delay_after: 8000
 
     - number: 10
       enemies:
-        - type: tank
-          count: 5
-          interval: 2000
-        - type: fire_elemental
-          count: 8
-          interval: 1000
-        - type: runner
-          count: 15
-          interval: 500
         - type: boss_ogre
           count: 1
           interval: 0
+        - type: armored
+          count: 6
+          interval: 1500
       delay_after: 0

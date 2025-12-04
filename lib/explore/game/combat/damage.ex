@@ -96,6 +96,7 @@ defmodule Explore.Game.Combat.Damage do
   def damage_type_color(:ice), do: "#38bdf8"
   def damage_type_color(:lightning), do: "#facc15"
   def damage_type_color(:poison), do: "#22c55e"
+  def damage_type_color(:energy), do: "#e879f9"
   def damage_type_color(_), do: "#ffffff"
 
   defp distance({x1, y1}, {x2, y2}) do

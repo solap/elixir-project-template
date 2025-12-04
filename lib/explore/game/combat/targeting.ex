@@ -20,15 +20,32 @@ defmodule Explore.Game.Combat.Targeting do
   @doc """
   Finds the best target for a tower based on its targeting strategy.
   Returns the enemy ID or nil if no valid targets.
+
+  Options:
+    - `:exclude_effects` - list of effect types to exclude (e.g., [:poison])
+      Enemies with any of these effects will be skipped
   """
-  @spec find_target(Tower.t(), %{String.t() => Enemy.t()}, strategy()) :: String.t() | nil
-  def find_target(%Tower{} = tower, enemies, strategy) when is_map(enemies) do
+  @spec find_target(Tower.t(), %{String.t() => Enemy.t()}, strategy(), keyword()) ::
+          String.t() | nil
+  def find_target(%Tower{} = tower, enemies, strategy, opts \\ []) when is_map(enemies) do
     enemies_in_range = get_enemies_in_range(tower, enemies)
 
-    if Enum.empty?(enemies_in_range) do
+    # Apply optional effect exclusion filter
+    filtered_enemies =
+      case Keyword.get(opts, :exclude_effects) do
+        nil ->
+          enemies_in_range
+
+        effects when is_list(effects) ->
+          Enum.reject(enemies_in_range, fn enemy ->
+            Enum.any?(effects, fn effect -> Enemy.has_effect?(enemy, effect) end)
+          end)
+      end
+
+    if Enum.empty?(filtered_enemies) do
       nil
     else
-      select_target(enemies_in_range, tower, strategy)
+      select_target(filtered_enemies, tower, strategy)
     end
   end
 

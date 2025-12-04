@@ -9,6 +9,10 @@ towers:
       fire_rate: 1.0
       projectile_speed: 400
     targeting: first
+    visual:
+      color: "#8B4513"
+      accent: "#D2691E"
+      projectile_type: arrow
 
   flame_tower:
     name: "Flame Tower"
@@ -24,6 +28,10 @@ towers:
         duration: 3000
         damage_per_tick: 2
     targeting: closest
+    visual:
+      color: "#DC2626"
+      accent: "#F97316"
+      projectile_type: fireball
 
   frost_tower:
     name: "Frost Tower"
@@ -38,6 +46,10 @@ towers:
         duration: 2000
         strength: 0.5
     targeting: first
+    visual:
+      color: "#38BDF8"
+      accent: "#E0F2FE"
+      projectile_type: iceball
 
   lightning_tower:
     name: "Lightning Tower"
@@ -50,6 +62,10 @@ towers:
       chain_targets: 3
       chain_damage_falloff: 0.7
     targeting: strongest
+    visual:
+      color: "#FACC15"
+      accent: "#FEF08A"
+      projectile_type: lightning
 
   bomb_launcher:
     name: "Bomb Launcher"
@@ -61,6 +77,10 @@ towers:
       fire_rate: 0.3
       aoe_radius: 80
     targeting: first
+    visual:
+      color: "#374151"
+      accent: "#6B7280"
+      projectile_type: bomb
 
   minion_factory:
     name: "Minion Factory"
@@ -78,3 +98,71 @@ towers:
         speed: 50
         lifetime: 10000
     targeting: first
+    visual:
+      color: "#7C3AED"
+      accent: "#A78BFA"
+      projectile_type: none
+
+  sniper_tower:
+    name: "Sniper Tower"
+    cost: 250
+    stats:
+      damage: 50
+      damage_type: physical
+      range: 300
+      fire_rate: 0.3
+      projectile_speed: 800
+    targeting: strongest
+    visual:
+      color: "#1F2937"
+      accent: "#9CA3AF"
+      projectile_type: bullet
+
+  poison_tower:
+    name: "Poison Tower"
+    cost: 200
+    stats:
+      damage: 3
+      damage_type: poison
+      range: 130
+      fire_rate: 1.5
+    effects:
+      - type: poison
+        duration: 5000
+        damage_per_tick: 4
+    targeting: first
+    visual:
+      color: "#22C55E"
+      accent: "#86EFAC"
+      projectile_type: poison_glob
+
+  laser_tower:
+    name: "Laser Tower"
+    cost: 350
+    stats:
+      damage: 15
+      damage_type: energy
+      range: 160
+      fire_rate: 3.0
+      beam_duration: 200
+    targeting: closest
+    visual:
+      color: "#E879F9"
+      accent: "#F5D0FE"
+      projectile_type: laser_beam
+
+  cannon_tower:
+    name: "Cannon Tower"
+    cost: 175
+    stats:
+      damage: 25
+      damage_type: physical
+      range: 140
+      fire_rate: 0.6
+      projectile_speed: 300
+      aoe_radius: 40
+    targeting: first
+    visual:
+      color: "#78716C"
+      accent: "#A8A29E"
+      projectile_type: cannonball

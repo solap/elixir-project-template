@@ -36,6 +36,12 @@ defmodule Explore.Game.Entities.Tower do
           spawn_minion: map() | nil
         }
 
+  @type visual_config :: %{
+          color: String.t() | nil,
+          accent: String.t() | nil,
+          projectile_type: atom() | nil
+        }
+
   @type t :: %__MODULE__{
           id: String.t(),
           type: atom(),
@@ -46,6 +52,7 @@ defmodule Explore.Game.Entities.Tower do
           targeting: targeting_strategy(),
           effects: list(effect_config()),
           special: special_config() | nil,
+          visual: visual_config(),
           cooldown: number(),
           target_id: String.t() | nil,
           last_spawn_tick: non_neg_integer()
@@ -70,6 +77,7 @@ defmodule Explore.Game.Entities.Tower do
             targeting: :first,
             effects: [],
             special: nil,
+            visual: %{color: nil, accent: nil, projectile_type: :arrow},
             cooldown: 0.0,
             target_id: nil,
             last_spawn_tick: 0
@@ -97,6 +105,14 @@ defmodule Explore.Game.Entities.Tower do
         Map.get(config, :stats, %{})
       )
 
+    visual_config = Map.get(config, :visual, %{})
+
+    visual =
+      Map.merge(
+        %{color: nil, accent: nil, projectile_type: :arrow},
+        normalize_visual(visual_config)
+      )
+
     %__MODULE__{
       id: id,
       type: type,
@@ -106,8 +122,18 @@ defmodule Explore.Game.Entities.Tower do
       cost: Map.get(config, :cost, 100),
       targeting: Map.get(config, :targeting, :first),
       effects: Map.get(config, :effects, []),
-      special: Map.get(config, :special)
+      special: Map.get(config, :special),
+      visual: visual
     }
+  end
+
+  defp normalize_visual(visual) do
+    visual
+    |> Map.update(:projectile_type, :arrow, fn
+      val when is_atom(val) -> val
+      val when is_binary(val) -> String.to_atom(val)
+      _ -> :arrow
+    end)
   end
 
   @doc """
@@ -250,6 +276,14 @@ defmodule Explore.Game.Entities.Tower do
   @spec in_range?(t(), position()) :: boolean()
   def in_range?(%__MODULE__{} = tower, position) do
     distance_to(tower, position) <= range(tower)
+  end
+
+  @doc """
+  Gets the tower's projectile type from visual config.
+  """
+  @spec projectile_type(t()) :: atom()
+  def projectile_type(%__MODULE__{visual: visual}) do
+    Map.get(visual, :projectile_type, :arrow)
   end
 
   defp generate_id do

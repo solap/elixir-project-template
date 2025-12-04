@@ -170,7 +170,9 @@ defmodule Explore.Game.Entities.Enemy do
         new_duration = effect.duration - delta_ms
 
         if new_duration > 0 do
-          tick_damage = Map.get(effect, :damage_per_tick, 0) * (delta_ms / 1000)
+          # Handle nil damage_per_tick (e.g., for slow effects)
+          damage_per_tick = effect.damage_per_tick || 0
+          tick_damage = damage_per_tick * (delta_ms / 1000)
           {[%{effect | duration: new_duration} | acc], damage + tick_damage}
         else
           {acc, damage}
@@ -257,15 +259,24 @@ defmodule Explore.Game.Entities.Enemy do
 
   # Calculate speed modifier from active effects
   defp calculate_speed_modifier(effects) do
-    # Find the strongest slow effect
-    slow_effects = Enum.filter(effects, fn e -> e.type == :slow end)
+    # Check for freeze or stun first (complete stop)
+    has_freeze = Enum.any?(effects, fn e -> e.type in [:freeze, :stun] end)
 
-    if Enum.empty?(slow_effects) do
-      1.0
+    if has_freeze do
+      0.0
     else
-      # Take the strongest slow (lowest multiplier)
-      slowest = Enum.min_by(slow_effects, fn e -> Map.get(e, :strength, 1.0) end)
-      Map.get(slowest, :strength, 1.0)
+      # Find slow effects
+      slow_effects = Enum.filter(effects, fn e -> e.type == :slow end)
+
+      if Enum.empty?(slow_effects) do
+        1.0
+      else
+        # Take the strongest slow (lowest multiplier)
+        # Use struct field access and handle nil
+        slow_effects
+        |> Enum.map(fn e -> e.strength || 1.0 end)
+        |> Enum.min()
+      end
     end
   end
 

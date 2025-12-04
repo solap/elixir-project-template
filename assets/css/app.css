@@ -29,7 +29,162 @@
   stroke-width: 1;
 }
 
-/* Enemy styles */
+/* Tower-specific animations */
+.flame-flicker {
+  animation: flame-flicker 0.3s ease-in-out infinite;
+}
+
+.flame-flicker-alt {
+  animation: flame-flicker 0.4s ease-in-out infinite 0.1s;
+}
+
+@keyframes flame-flicker {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-2px) scaleY(1.1);
+    opacity: 1;
+  }
+}
+
+.sparkle {
+  animation: sparkle 1s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.electric-glow {
+  animation: electric-glow 0.2s ease-in-out infinite;
+}
+
+@keyframes electric-glow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px #FACC15);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px #FACC15);
+  }
+}
+
+.bubble {
+  animation: bubble 1.5s ease-in-out infinite;
+}
+
+.bubble-alt {
+  animation: bubble 1.8s ease-in-out infinite 0.3s;
+}
+
+@keyframes bubble {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-4px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+.laser-glow {
+  animation: laser-glow 0.5s ease-in-out infinite;
+}
+
+@keyframes laser-glow {
+  0%, 100% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 3px #E879F9);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #E879F9);
+  }
+}
+
+/* Enemy animation classes - applied by type */
+.enemy-bounce .enemy-body {
+  animation: enemy-bounce 0.4s ease-in-out infinite;
+}
+
+.enemy-wobble .enemy-body {
+  animation: enemy-wobble 0.5s ease-in-out infinite;
+}
+
+.enemy-pulse .enemy-body {
+  animation: enemy-pulse 0.8s ease-in-out infinite;
+}
+
+.enemy-crawl .enemy-body {
+  animation: enemy-crawl 0.6s ease-in-out infinite;
+}
+
+.enemy-float .enemy-body {
+  animation: enemy-float 2s ease-in-out infinite;
+}
+
+@keyframes enemy-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes enemy-wobble {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes enemy-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes enemy-crawl {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  25% {
+    transform: translateY(-1px) scaleY(0.95);
+  }
+  75% {
+    transform: translateY(1px) scaleY(1.05);
+  }
+}
+
+@keyframes enemy-float {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+/* Legacy enemy styles */
 .enemy {
   transition: transform 0.05s linear;
 }
@@ -49,7 +204,73 @@
 
 /* Projectile styles */
 .projectile {
-  @apply fill-yellow-400;
+  transition: transform 0.02s linear;
+}
+
+/* Minion styles */
+.fuse-burn {
+  animation: fuse-burn 0.3s ease-in-out infinite;
+}
+
+.spark {
+  animation: spark 0.2s ease-in-out infinite;
+}
+
+@keyframes fuse-burn {
+  0%, 100% {
+    stroke: #ef4444;
+  }
+  50% {
+    stroke: #fbbf24;
+  }
+}
+
+@keyframes spark {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+/* Walking bomb minion */
+.walking-bomb {
+  animation: walking-bounce 0.3s ease-in-out infinite;
+}
+
+.walking-bomb .leg-left {
+  animation: walk-leg-left 0.3s ease-in-out infinite;
+}
+
+.walking-bomb .leg-right {
+  animation: walk-leg-right 0.3s ease-in-out infinite;
+}
+
+.walking-bomb .spark-glow {
+  animation: spark-glow 0.3s ease-in-out infinite;
+}
+
+@keyframes walking-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes walk-leg-left {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes walk-leg-right {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+}
+
+@keyframes spark-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.3); }
 }
 
 /* Path styles */
@@ -110,13 +331,96 @@
   @apply fill-orange-400/50;
 }
 
-/* Explosion effect */
-@keyframes explode {
-  0% { transform: scale(0); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
+/* Poison effect - dripping animation */
+.effect-poison {
+  animation: poison-bubble 1.5s ease-in-out infinite;
 }
 
+.poison-drip {
+  animation: poison-drip 1s ease-in infinite;
+}
+
+.poison-drip-delayed {
+  animation: poison-drip 1s ease-in infinite 0.5s;
+}
+
+@keyframes poison-bubble {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(2px); opacity: 0.6; }
+}
+
+@keyframes poison-drip {
+  0% { transform: translateY(0); opacity: 0.6; }
+  100% { transform: translateY(5px); opacity: 0; }
+}
+
+/* Explosion animations - general */
 .explosion {
   animation: explode 0.3s ease-out forwards;
-  @apply fill-orange-500;
+}
+
+@keyframes explode {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Damage-type specific explosion animations */
+.explosion-physical {
+  animation: explode-physical 0.25s ease-out forwards;
+}
+
+@keyframes explode-physical {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.explosion-fire {
+  animation: explode-fire 0.35s ease-out forwards;
+}
+
+@keyframes explode-fire {
+  0% { transform: scale(0.5); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.explosion-ice {
+  animation: explode-ice 0.4s ease-out forwards;
+}
+
+@keyframes explode-ice {
+  0% { transform: scale(0.3) rotate(0deg); opacity: 1; }
+  100% { transform: scale(1.4) rotate(45deg); opacity: 0; }
+}
+
+.explosion-lightning {
+  animation: explode-lightning 0.2s ease-out forwards;
+}
+
+@keyframes explode-lightning {
+  0% { transform: scale(1); opacity: 1; }
+  25% { transform: scale(1.3); opacity: 0.5; }
+  50% { transform: scale(0.9); opacity: 1; }
+  75% { transform: scale(1.2); opacity: 0.3; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.explosion-poison {
+  animation: explode-poison 0.5s ease-out forwards;
+}
+
+@keyframes explode-poison {
+  0% { transform: scale(0.5); opacity: 0.8; }
+  60% { transform: scale(1.1); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.explosion-energy {
+  animation: explode-energy 0.3s ease-out forwards;
+}
+
+@keyframes explode-energy {
+  0% { transform: scale(0.3); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.7; }
+  100% { transform: scale(2); opacity: 0; }
 }

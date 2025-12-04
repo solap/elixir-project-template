@@ -116,7 +116,9 @@ defmodule Explore.Game.Tick do
       world.towers
       |> Enum.reduce({world.towers, []}, fn {id, tower}, {towers_acc, projectiles_acc} ->
         if Tower.can_fire?(tower) and not Tower.spawns_minions?(tower) do
-          target_id = Targeting.find_target(tower, world.enemies, tower.targeting)
+          # Determine targeting options based on tower effects
+          targeting_opts = get_targeting_opts(tower)
+          target_id = Targeting.find_target(tower, world.enemies, tower.targeting, targeting_opts)
 
           if target_id do
             target = Map.get(world.enemies, target_id)
@@ -177,6 +179,7 @@ defmodule Explore.Game.Tick do
       target_position: target.position,
       damage: Tower.damage(tower),
       damage_type: Tower.damage_type(tower),
+      projectile_type: Tower.projectile_type(tower),
       speed: Map.get(tower.stats, :projectile_speed, 300),
       aoe_radius: Tower.aoe_radius(tower),
       effects: tower.effects,
@@ -438,5 +441,21 @@ defmodule Explore.Game.Tick do
 
     # Remove enemies that reached the end
     %{world_after_lives | enemies: Map.new(still_walking, fn e -> {e.id, e} end)}
+  end
+
+  # Determine targeting options based on tower effects
+  # Towers that apply status effects should skip enemies that already have them
+  defp get_targeting_opts(%Tower{effects: effects}) do
+    effect_types = Enum.map(effects, fn effect -> Map.get(effect, :type) end)
+
+    exclude_effects =
+      effect_types
+      |> Enum.filter(fn type -> type in [:poison, :slow] end)
+
+    if Enum.empty?(exclude_effects) do
+      []
+    else
+      [exclude_effects: exclude_effects]
+    end
   end
 end
