@@ -1,0 +1,50 @@
+map:
+  name: "The Winding Path"
+  width: 800
+  height: 600
+  grid_size: 40
+
+  # Path waypoints creating an S-curve from left to right
+  # Designed to not loop and stay within bounds
+  path:
+    - x: 0
+      y: 300
+    - x: 100
+      y: 300
+    - x: 150
+      y: 200
+    - x: 250
+      y: 100
+    - x: 400
+      y: 100
+    - x: 500
+      y: 200
+    - x: 550
+      y: 350
+    - x: 500
+      y: 500
+    - x: 350
+      y: 500
+    - x: 250
+      y: 400
+    - x: 300
+      y: 300
+    - x: 450
+      y: 250
+    - x: 600
+      y: 300
+    - x: 700
+      y: 350
+    - x: 800
+      y: 300
+
+  # Valid tower placement zones (grid coordinates)
+  # Towers can be placed on cells not occupied by the path
+  buildable_zones:
+    - x: 0
+      y: 0
+      width: 20
+      height: 15
+
+  # Path width in pixels (for collision/visual)
+  path_width: 30

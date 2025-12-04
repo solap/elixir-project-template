@@ -1,6 +1,5 @@
 [
-  import_deps: [:ecto, :ecto_sql, :phoenix, :absinthe],
-  subdirectories: ["priv/*/migrations"],
+  import_deps: [:phoenix],
   plugins: [Phoenix.LiveView.HTMLFormatter],
   inputs: [
     "*.{heex,ex,exs}",

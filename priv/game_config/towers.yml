@@ -1,0 +1,80 @@
+towers:
+  arrow_tower:
+    name: "Arrow Tower"
+    cost: 100
+    stats:
+      damage: 10
+      damage_type: physical
+      range: 150
+      fire_rate: 1.0
+      projectile_speed: 400
+    targeting: first
+
+  flame_tower:
+    name: "Flame Tower"
+    cost: 200
+    stats:
+      damage: 5
+      damage_type: fire
+      range: 100
+      fire_rate: 2.0
+      aoe_radius: 50
+    effects:
+      - type: burn
+        duration: 3000
+        damage_per_tick: 2
+    targeting: closest
+
+  frost_tower:
+    name: "Frost Tower"
+    cost: 250
+    stats:
+      damage: 8
+      damage_type: ice
+      range: 120
+      fire_rate: 0.8
+    effects:
+      - type: slow
+        duration: 2000
+        strength: 0.5
+    targeting: first
+
+  lightning_tower:
+    name: "Lightning Tower"
+    cost: 350
+    stats:
+      damage: 25
+      damage_type: lightning
+      range: 140
+      fire_rate: 0.5
+      chain_targets: 3
+      chain_damage_falloff: 0.7
+    targeting: strongest
+
+  bomb_launcher:
+    name: "Bomb Launcher"
+    cost: 300
+    stats:
+      damage: 40
+      damage_type: physical
+      range: 180
+      fire_rate: 0.3
+      aoe_radius: 80
+    targeting: first
+
+  minion_factory:
+    name: "Minion Factory"
+    cost: 400
+    stats:
+      damage: 0
+      damage_type: physical
+      range: 0
+      fire_rate: 0
+      spawn_interval: 5.0
+    special:
+      spawn_minion:
+        type: walking_bomb
+        damage: 30
+        speed: 50
+        lifetime: 10000
+    targeting: first

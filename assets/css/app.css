@@ -1,0 +1,122 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Game-specific styles */
+.game-container {
+  @apply h-screen flex flex-row;
+}
+
+.game-board {
+  @apply flex-1 relative overflow-hidden;
+}
+
+.game-board svg {
+  @apply w-full h-full;
+}
+
+/* Tower styles */
+.tower {
+  transition: transform 0.1s ease;
+}
+
+.tower:hover {
+  transform: scale(1.1);
+}
+
+.tower-range {
+  @apply fill-blue-500/20 stroke-blue-500;
+  stroke-width: 1;
+}
+
+/* Enemy styles */
+.enemy {
+  transition: transform 0.05s linear;
+}
+
+.health-bar-bg {
+  @apply fill-gray-700;
+}
+
+.health-bar-fg {
+  @apply fill-green-500;
+  transition: width 0.1s ease;
+}
+
+.health-bar-fg.low {
+  @apply fill-red-500;
+}
+
+/* Projectile styles */
+.projectile {
+  @apply fill-yellow-400;
+}
+
+/* Path styles */
+.game-path {
+  @apply fill-amber-800 stroke-amber-900;
+  stroke-width: 2;
+}
+
+/* Grid styles */
+.grid-cell {
+  @apply fill-transparent stroke-gray-700/30;
+  stroke-width: 0.5;
+}
+
+.grid-cell.valid {
+  @apply fill-green-500/20;
+}
+
+.grid-cell.invalid {
+  @apply fill-red-500/20;
+}
+
+/* Panel styles */
+.game-panel {
+  @apply bg-gray-800 border-l border-gray-700 p-4;
+}
+
+.tower-button {
+  @apply p-2 rounded border-2 border-gray-600 hover:border-blue-500 transition-colors;
+}
+
+.tower-button.selected {
+  @apply border-blue-500 bg-blue-500/20;
+}
+
+.tower-button.disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Designer mode styles */
+.designer-panel {
+  @apply bg-gray-900/90 border-t border-gray-700 p-4;
+}
+
+/* Effect animations */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.effect-slow {
+  animation: pulse-glow 1s ease-in-out infinite;
+  @apply fill-blue-400/50;
+}
+
+.effect-burn {
+  animation: pulse-glow 0.5s ease-in-out infinite;
+  @apply fill-orange-400/50;
+}
+
+/* Explosion effect */
+@keyframes explode {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.explosion {
+  animation: explode 0.3s ease-out forwards;
+  @apply fill-orange-500;
+}

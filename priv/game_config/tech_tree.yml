@@ -1,0 +1,59 @@
+tech_tree:
+  nodes:
+    basic_towers:
+      name: "Basic Towers"
+      description: "Unlock basic tower types"
+      unlocks:
+        - arrow_tower
+      requirements: []
+      cost: 0
+
+    fire_mastery:
+      name: "Fire Mastery"
+      description: "Harness the power of fire"
+      unlocks:
+        - flame_tower
+      requirements:
+        - basic_towers
+      cost: 100
+
+    frost_mastery:
+      name: "Frost Mastery"
+      description: "Control ice and cold"
+      unlocks:
+        - frost_tower
+      requirements:
+        - basic_towers
+      cost: 100
+
+    storm_mastery:
+      name: "Storm Mastery"
+      description: "Command lightning"
+      unlocks:
+        - lightning_tower
+      requirements:
+        - fire_mastery
+        - frost_mastery
+      cost: 250
+
+    explosives:
+      name: "Explosives"
+      description: "Explosive ordinance"
+      unlocks:
+        - bomb_launcher
+      requirements:
+        - basic_towers
+      cost: 150
+
+    minion_tech:
+      name: "Minion Technology"
+      description: "Create autonomous fighters"
+      unlocks:
+        - minion_factory
+      requirements:
+        - explosives
+        - storm_mastery
+      cost: 400
+
+  starting_unlocked:
+    - basic_towers
